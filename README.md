@@ -8,7 +8,7 @@ pip install -U dirtree
 ```
 
 ## Usage
-```bash
+```yaml
 usage: dirtree [-h] [-d [D]] [-f] [-i I]
 
 optional arguments:
@@ -16,6 +16,7 @@ optional arguments:
   -d [D]      directory to print tree of
   -f          print files
   -i I        indentation
+  -c          write to clipboard
 ```
 
 Example:  

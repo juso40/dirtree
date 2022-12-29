@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "dirtree"
+name = "ascii-dirtree"
 version = "1.0.0"
 authors = [
   { name="Justin Sostmann", email="" },

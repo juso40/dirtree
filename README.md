@@ -4,7 +4,7 @@ Generate good-looking ascii trees of directories and files.
 ## Installation
 Install and update using [pip](https://pip.pypa.io/en/stable/quickstart/):
 ```bash
-pip install -U dirtree
+pip install -U ascii-dirtree
 ```
 
 ## Usage

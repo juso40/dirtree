@@ -1,11 +1,11 @@
-from typing import IO
 import argparse
+import io
 import os
+import sys
+import tkinter as tk
 from os import listdir, sep
 from os.path import abspath, basename, isdir
-import tkinter as tk
-import io
-import sys
+from typing import IO
 
 
 def tree(path: os.PathLike, indent: int, prefix: str, files: bool, last: bool, root: bool, out: IO) -> None:
@@ -63,7 +63,3 @@ def main():
         r.update()  # now it stays on the clipboard after the window is closed
         r.destroy()
         out.close()
-
-
-if __name__ == "__main__":
-    main()

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ascii-dirtree"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="Justin Sostmann", email="" },
 ]
@@ -23,4 +23,4 @@ classifiers = [
 "Bug Tracker" = "https://github.com/juso40/dirtree/issues"
 
 [project.scripts]
-dirtree = "dirtree:main"
+dirtree = "dirtree.console:main"

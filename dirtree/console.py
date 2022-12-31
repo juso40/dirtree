@@ -1,4 +1,5 @@
 import argparse
+import fnmatch
 import io
 import os
 import sys
@@ -6,7 +7,6 @@ import tkinter as tk
 from os import listdir, sep
 from os.path import abspath, basename, isdir
 from typing import IO, List, Optional
-import fnmatch
 
 
 def filter_paths(paths: list, remove_files: bool, ignore_by_glob: Optional[List[str]]) -> list:

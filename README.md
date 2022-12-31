@@ -9,14 +9,18 @@ pip install -U ascii-dirtree
 
 ## Usage
 ```yaml
-usage: dirtree [-h] [-d [D]] [-f] [-i I]
+usage: dirtree [-h] [-p [PATH]] [-f] [-c] [-i [IGNORE ...]] [-d DEPTH]
 
 optional arguments:
-  -h, --help  show this help message and exit
-  -d [D]      directory to print tree of
-  -f          print files
-  -i I        indentation
-  -c          write to clipboard
+  -h, --help            show this help message and exit
+  -p [PATH], --path [PATH]
+                        Path to start from
+  -f, --files           print files
+  -c, --clip            copy to clipboard
+  -i [IGNORE ...], --ignore [IGNORE ...]
+                        ignore files matching glob
+  -d DEPTH, --depth DEPTH
+                        depth to traverse, negative for infinite
 ```
 
 Example:  

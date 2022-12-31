@@ -5,56 +5,72 @@ import sys
 import tkinter as tk
 from os import listdir, sep
 from os.path import abspath, basename, isdir
-from typing import IO
+from typing import IO, List, Optional
+import fnmatch
 
 
-def tree(path: os.PathLike, indent: int, prefix: str, files: bool, last: bool, root: bool, out: IO) -> None:
+def filter_paths(paths: list, remove_files: bool, ignore_by_glob: Optional[List[str]]) -> list:
+    if not ignore_by_glob and not remove_files:
+        return paths
+
+    filtered_paths = []
+    for path in paths:
+        if remove_files and os.path.isfile(path):
+            continue
+        if ignore_by_glob and any(fnmatch.fnmatch(path, glob) for glob in ignore_by_glob):
+            continue
+        filtered_paths.append(path)
+    return filtered_paths
+
+
+def tree(path: os.PathLike, prefix: str, files: bool, out: IO, ignore_globs: Optional[List[str]], depth: int) -> None:
     path = abspath(path)
-    if root:
-        print(basename(path) + sep if isdir(path) else basename(path), file=out)
-    else:
-        prefix_add: str = "└── " if last else "├── "
-        print(
-            prefix[:-(indent + 1)] + prefix_add + basename(path)
-            + sep if isdir(path) else prefix + prefix_add + basename(path),
-            file=out
-        )
-    prefix = prefix[:-1]
+    if os.path.isfile(path) and not files:
+        return
 
-    whitespace = " " * indent
-    ls = listdir(path)
+    print(prefix + basename(path) + sep if isdir(path) else prefix + basename(path), file=out)
+
+    if isdir(path):
+        ls = filter_paths(listdir(path), not files, ignore_globs)
+        # We are a directory, so lets remove our own prefix and replace it with whitespace
+        prefix = prefix.replace("├── ", "│   ", 1).replace("└── ", "    ", 1)
+        walk_tree(path, prefix, files, ls, out, ignore_globs, depth)
+
+
+def walk_tree(path: str, prefix: str, files: bool, ls: list, out: IO, ignore_globs: Optional[List[str]],
+              depth: int) -> None:
+    if depth == 0:
+        return
     for i, item in enumerate(ls):
-        check_dir = path + sep + item
         is_last = i == len(ls) - 1
-        if isdir(check_dir):
-            tree(
-                path=check_dir,
-                indent=indent,
-                prefix=prefix + (" " + whitespace * 2 if is_last else f"{whitespace}│{whitespace}"),
-                files=files,
-                last=is_last,
-                root=False,
-                out=out
-            )
-        elif files:
-            print(prefix + (f"{whitespace}└── " if is_last else f"{whitespace}├── ") + item, file=out)
+        next_prefix = prefix + ("└── " if is_last else "├── ")
+
+        tree(os.path.join(path, item), next_prefix, files, out, ignore_globs, depth - 1)
+
+
+def root(path: os.PathLike, files: bool, out: IO, ignore_globs: Optional[List[str]], depth: int) -> None:
+    path = abspath(path)
+    print(basename(path) + sep if isdir(path) else basename(path), file=out)
+    ls = filter_paths(listdir(path), not files, ignore_globs)
+    walk_tree(path, "  ", files, ls, out, ignore_globs, depth)
 
 
 def main():
     args = argparse.ArgumentParser()
-    args.add_argument("-d", nargs="?", default=".", help="directory to print tree of")
-    args.add_argument("-f", action="store_true", default=False, help="print files")
-    args.add_argument("-i", default=2, type=int, help="indentation")
-    args.add_argument("-c", action="store_true", default=False, help="copy to clipboard")
+    args.add_argument("-p", "--path", nargs="?", default=".", help="Path to start from")
+    args.add_argument("-f", "--files", action="store_true", default=False, help="print files")
+    args.add_argument("-c", "--clip", action="store_true", default=False, help="copy to clipboard")
+    args.add_argument("-i", "--ignore", nargs="*", default=None, help="ignore files matching glob")
+    args.add_argument("-d", "--depth", type=int, default=-1, help="depth to traverse, negative for infinite")
     args = args.parse_args()
 
-    if args.c:
+    if args.clip:
         out = io.StringIO()
     else:
         out = sys.stdout
-    tree(args.d, args.i, "", args.f, False, True, out)
+    root(args.path, args.files, out, args.ignore, args.depth)
 
-    if args.c:
+    if args.clip:
         r = tk.Tk()
         r.withdraw()
         r.clipboard_clear()
